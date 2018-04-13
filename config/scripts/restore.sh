@@ -5,10 +5,10 @@ if [ -z "$SKIP_BACKUP" ]; then
     if [ -f "/var/www/web/sites/$x/settings.php" ]; then
       cd /var/www/web/sites/$x
       if [ -f "/backup/$x.tar.gz" ]; then
-        tar -czf /backup/$x.tar.gz files
+        tar -xzf /backup/$x.tar.gz
       else
         if [ -f "/backup/files.tar.gz" ]; then
-          tar -czf /backup/files.tar.gz files
+          tar -xzf /backup/files.tar.gz
         fi
       fi
     fi
