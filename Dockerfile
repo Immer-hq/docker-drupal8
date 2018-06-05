@@ -23,7 +23,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
       nodejs rsync \
       build-essential \
       unzip git-core ssh curl mysql-client nano vim less \
-      msmtp msmtp-mta \
+      msmtp msmtp-mta telnet \
  && rm -Rf /var/cache/apt/* \
  && systemctl disable apache2 \
  && a2enmod rewrite expires \
@@ -36,7 +36,8 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && sed -i 's/\/var\/www\/html/\/var\/www\/web/g' /etc/apache2/sites-enabled/000-default.conf \
  && composer global require drush/drush:8.* \
  && ln -s /root/.composer/vendor/bin/drush /usr/bin/drush \
- && phpdismod xdebug
+ && phpdismod xdebug \
+ && drush dl drush_language-8.x
 
 COPY config/php.ini /etc/php/7.1/apache2/php.ini
 COPY config/apache2.conf /etc/apache2/apache2.conf
