@@ -1,62 +1,49 @@
 'use strict';
 
-const Fs = require('fs');
 const exec = require('child_process').exec;
-
-let composerJson = Fs.readFileSync('/var/www/composer.json').toString();
 
 function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
-exec('drush ups --format=csv | { grep "`drush php-eval "print t(\'SECURITY UPDATE available\');"`" || true; }', {
-  cwd: '/var/www/web'
-}, (err, result) => {
-  if (err) {
+exec('php /var/scripts/security-checker.phar security:check /var/www/composer.lock --format=json', {
+  cwd: '/var/www'
+}, async (err, result) => {
+  // Tool returns code 1 when updates are available.
+  if (err.code > 1) {
     console.error('Error while fetching updates:', err);
     process.exit(1);
   }
 
-  let count = 0;
+  result = JSON.parse(result);
+  const packages = typeof result === 'object' && !Array.isArray(result) ? Object.keys(result) : [];
 
-  result.split('\n').filter(item => item).map(item => {
-    const parts = item.split(',');
-    let project;
-    let version;
-    if (parts[0] === 'drupal') {
-      // Core has a different version numbering.
-      project = 'core';
-      version = parts[2];
-    } else {
-      project = parts[0];
-      version = parts[2].replace('8.x-', '');
-    }
-    return {project, version};
-  }).filter(item => {
+  const update = packages.filter(name => {
     const exclude = (process.env.exclude || '').split(',');
-    return exclude.indexOf(item.project) < 0;
-  }).forEach(item => {
-    ++count;
-    const {project, version} = item;
-    const pattern = new RegExp(escapeRegExp(`"drupal/${project}"`) + ':[\\s]+"[^"]+"');
-    composerJson = composerJson.replace(pattern, `"drupal/${project}": "${version}"`);
+    return exclude.indexOf(name) < 0 && exclude.indexOf(name.replace('drupal/', '')) < 0;
   });
 
-  if (count === 0) {
+  if (update === 0) {
     console.error('No security updates found');
     process.exit(0);
   }
 
-  Fs.writeFileSync('/var/www/composer.json', composerJson);
-  exec('composer update', {
-    cwd: '/var/www'
-  }, (err, result) => {
-    if (err) {
-      console.error('Error installing updates:', err);
-      process.exit(1);
-    }
-    console.error('Updates succesfully installed');
-    console.log('Changed: /var/www/composer.json => /composer.json');
-    console.log('Changed: /var/www/composer.lock => /composer.lock');
-  });
+  for (let i = 0; i < update.length; ++i) {
+    const name = update[i];
+    await new Promise(resolve => {
+      exec(`composer require ${name} --update-with-dependencies --no-progress`, {
+        cwd: '/var/www'
+      }, err => {
+        if (err) {
+          console.error('Error installing updates:', err);
+          process.exit(1);
+        }
+        resolve();
+      });
+    });
+  }
+
+  console.error('Updates succesfully installed');
+  console.log('Changed: /var/www/composer.json => /composer.json');
+  console.log('Changed: /var/www/composer.lock => /composer.lock');
 });
