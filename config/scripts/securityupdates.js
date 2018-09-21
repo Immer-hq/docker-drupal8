@@ -1,5 +1,7 @@
 'use strict';
 
+const promisify = require('util').promisify;
+const readFile = promisify(require('fs').readFile);
 const exec = require('child_process').exec;
 
 function escapeRegExp(str) {
@@ -15,10 +17,18 @@ exec('php /var/scripts/security-checker.phar security:check /var/www/composer.lo
     process.exit(1);
   }
 
+  const composerJson = JSON.parse((await readFile('/var/www/composer.json')).toString());
+
   result = JSON.parse(result);
   const packages = typeof result === 'object' && !Array.isArray(result) ? Object.keys(result) : [];
 
   const update = packages.filter(name => {
+    if (typeof composerJson.require[name] === 'undefined') {
+      // Skip packages that are not listed in composer.json.
+      // These are dependencies that often run into unresolvable dependency errors when trying to update them.
+      // For exapmle, this tries to update Symfony to 4 on Drupal 8, which requires Symfony 3.4.
+      return false;
+    }
     const exclude = (process.env.exclude || '').split(',');
     return exclude.indexOf(name) < 0 && exclude.indexOf(name.replace('drupal/', '')) < 0;
   });
