@@ -18,7 +18,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
  && apt-get install -y --no-install-recommends --allow-unauthenticated apache2 php7.1 libapache2-mod-php7.1 php-memcached \
       php7.1-mcrypt php7.1-mbstring php7.1-xml php7.1-mysql php7.1-opcache php7.1-json \
-      php7.1-gd php7.1-curl php7.1-ldap php7.1-mysql php7.1-odbc php7.1-soap php7.1-xsl \
+      php7.1-gd php7.1-curl php7.1-ldap php7.1-mysql php7.1-odbc php-7.1-bcmath php7.1-soap php7.1-xsl \
       php7.1-zip php7.1-intl php7.1-cli php7.1-xdebug \
       nodejs rsync \
       build-essential \
@@ -27,6 +27,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && rm -Rf /var/cache/apt/* \
  && systemctl disable apache2 \
  && a2enmod rewrite expires \
+ && phpenmod bcmath \
  && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php \
  && php -r "unlink('composer-setup.php');" \
