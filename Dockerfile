@@ -27,6 +27,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && rm -Rf /var/cache/apt/* \
  && systemctl disable apache2 \
  && a2enmod rewrite expires \
+ && a2enmod headers \
  && phpenmod bcmath \
  && php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php \
