@@ -42,7 +42,10 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && drush dl drush_language-8.x \
  && mkdir -p /var/scripts \
  && cd /var/scripts \
- && curl -O http://get.sensiolabs.org/security-checker.phar
+ && curl -O http://get.sensiolabs.org/security-checker.phar \
+ && curl https://drupalconsole.com/installer -L -o drupal.phar \
+ && mv drupal.phar /usr/local/bin/drupal \
+ && chmod +x /usr/local/bin/drupal
 
 COPY config/php.ini /etc/php/7.1/apache2/php.ini
 COPY config/apache2.conf /etc/apache2/apache2.conf
