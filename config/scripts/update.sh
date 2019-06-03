@@ -20,7 +20,7 @@ for x in `ls /var/www/web/sites`; do
     if [ $? -ne 0 ]; then
       exit 1
     fi
-    if [ -f ../translations/nl.po ]: then
+    if [ -f "../translations/nl.po" ]; then
       drush language-import ../translations/nl.po
     fi
   fi
