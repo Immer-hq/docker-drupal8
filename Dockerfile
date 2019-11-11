@@ -39,7 +39,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
  && composer global require drush/drush:8.* \
  && ln -s /root/.composer/vendor/bin/drush /usr/bin/drush \
  && phpdismod xdebug \
- && drush dl drush_language-8.x \
+ && drush dl drush_language-9.x \
  && mkdir -p /var/scripts \
  && cd /var/scripts \
  && curl -O http://get.sensiolabs.org/security-checker.phar \
