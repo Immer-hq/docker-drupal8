@@ -9,7 +9,7 @@ function escapeRegExp(str) {
   return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 }
 
-exec('drush ups --format=csv | { grep "`drush php-eval "print t(\'SECURITY UPDATE available\');"`" || true; }', {
+exec('drush ups --format=csv | grep \'SECURITY UPDATE\'', {
   cwd: '/var/www/web'
 }, (err, result) => {
   if (err) {
