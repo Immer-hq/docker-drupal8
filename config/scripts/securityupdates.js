@@ -13,8 +13,8 @@ exec('drush ups --format=csv | grep \'SECURITY UPDATE\'', {
   cwd: '/var/www/web'
 }, (err, result) => {
   if (err) {
-    console.error('Error while fetching updates:', err);
-    process.exit(1);
+    console.error('No updates found');
+    process.exit(0);
   }
 
   let count = 0;
