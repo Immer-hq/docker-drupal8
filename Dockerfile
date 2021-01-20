@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 EXPOSE 80
 
@@ -8,24 +8,24 @@ ENV LANG=C.UTF-8 \
   SMTP_AUTH=off \
   SMTP_USER= \
   SMTP_PASS= \
-  SMTP_FROM=noreply@example.com
+  SMTP_FROM=noreply@example.com \
+  DEBIAN_FRONTEND=noninteractive
 
 RUN echo Europe/Paris | tee /etc/timezone \
   && apt-get update \
-  && apt-get install -y software-properties-common python-software-properties curl \
+  && apt-get install -y software-properties-common curl \
   && add-apt-repository -y ppa:ondrej/php \
   && apt-get update \
   && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
   && apt-get install -y --no-install-recommends --allow-unauthenticated apache2 php7.4 libapache2-mod-php7.4 php-memcached \
-  php7.4-mcrypt php7.4-mbstring php7.4-xml php7.4-mysql php7.4-opcache php7.4-json \
-  php7.4-gd php7.4-curl php7.4-ldap php7.4-mysql php7.4-odbc php7.4-bcmath php7.4-soap php7.4-xsl \
+  php7.4-mbstring php7.4-xml php7.4-mysql php7.4-opcache php7.4-json \
+  php7.4-gd php7.4-curl php7.4-ldap php7.4-mysql php7.4-odbc php7.4-soap php7.4-xsl \
   php7.4-zip php7.4-intl php7.4-cli php7.4-xdebug \
   nodejs rsync \
   build-essential \
   unzip git-core ssh curl mysql-client nano vim less \
   msmtp msmtp-mta telnet \
   && rm -Rf /var/cache/apt/* \
-  && systemctl disable apache2 \
   && a2enmod rewrite expires \
   && a2enmod headers \
   && phpenmod bcmath \
