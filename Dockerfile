@@ -37,7 +37,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
   && npm install -g grunt-cli \
   && sed -i 's/\/var\/www\/html/\/var\/www\/web/g' /etc/apache2/sites-enabled/000-default.conf \
   && composer global require drush/drush:9.* \
-  && ln -s /root/.composer/vendor/bin/drush /usr/bin/drush \
+  && ln -s /root/.config/composer/vendor/bin/drush /usr/bin/drush \
   && phpdismod xdebug \
   && drush dl drush_language-9.x \
   && mkdir -p /var/scripts \
