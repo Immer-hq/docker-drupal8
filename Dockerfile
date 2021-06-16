@@ -41,7 +41,6 @@ RUN echo Europe/Paris | tee /etc/timezone \
   && phpdismod xdebug \
   && mkdir -p /var/scripts \
   && cd /var/scripts \
-  && curl -O http://get.sensiolabs.org/security-checker.phar \
   && curl https://drupalconsole.com/installer -L -o drupal.phar \
   && mv drupal.phar /usr/local/bin/drupal \
   && chmod +x /usr/local/bin/drupal \

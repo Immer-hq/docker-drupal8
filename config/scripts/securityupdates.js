@@ -1,54 +1,24 @@
 'use strict';
 
-const Fs = require('fs');
 const exec = require('child_process').exec;
 
-let composerJson = Fs.readFileSync('/var/www/composer.json').toString();
-
-function escapeRegExp(str) {
-  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
-
-exec('drush ups --format=csv | grep \'SECURITY UPDATE\'', {
-  cwd: '/var/www/web'
+exec('/var/www/vendor/drush/drush/drush pm:security -n', {
+  cwd: '/var/www'
 }, (err, result) => {
-  if (err) {
-    console.error('No updates found');
-    process.exit(0);
-  }
-
-  let count = 0;
-
-  result.split('\n').filter(item => item).map(item => {
-    const parts = item.split(',');
-    let project;
-    let version;
-    if (parts[0] === 'drupal') {
-      // Core has a different version numbering.
-      project = 'core';
-      version = parts[2];
-    } else {
-      project = parts[0];
-      version = parts[2].replace('8.x-', '');
-    }
-    return {project, version};
-  }).filter(item => {
-    const exclude = (process.env.exclude || '').split(',');
-    return exclude.indexOf(item.project) < 0;
-  }).forEach(item => {
-    ++count;
-    const {project, version} = item;
-    const pattern = new RegExp(escapeRegExp(`"drupal/${project}"`) + ':[\\s]+"[^"]+"');
-    composerJson = composerJson.replace(pattern, `"drupal/${project}": "${version}"`);
-  });
-
-  if (count === 0) {
+  if (!err) {
     console.error('No security updates found');
     process.exit(0);
   }
 
-  Fs.writeFileSync('/var/www/composer.json', composerJson);
-  exec('composer update', {
+  const match = err.message.match(/Try running: (composer require .+ --update-with-dependencies)/);
+  if (!match) {
+    console.error('No security updates found');
+    process.exit(0);
+  }
+
+  const updateCommand = match[1];
+
+  exec(updateCommand, {
     cwd: '/var/www'
   }, (err, result) => {
     if (err) {
