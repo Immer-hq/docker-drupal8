@@ -16,7 +16,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
   && apt-get install -y software-properties-common curl \
   && add-apt-repository -y ppa:ondrej/php \
   && apt-get update \
-  && curl -sL https://deb.nodesource.com/setup_9.x | bash - \
+  && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
   && apt-get install -y --no-install-recommends --allow-unauthenticated apache2 php7.4 libapache2-mod-php7.4 php-memcached \
   php7.4-mbstring php7.4-xml php7.4-mysql php7.4-opcache php7.4-json \
   php7.4-gd php7.4-curl php7.4-ldap php7.4-mysql php7.4-odbc php7.4-soap php7.4-xsl \
