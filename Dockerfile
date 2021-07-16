@@ -24,7 +24,7 @@ RUN echo Europe/Paris | tee /etc/timezone \
   nodejs rsync \
   build-essential \
   unzip git-core ssh curl mysql-client nano vim less \
-  msmtp msmtp-mta telnet \
+  msmtp msmtp-mta telnet sudo \
   && rm -Rf /var/cache/apt/* \
   && a2enmod rewrite expires \
   && a2enmod headers \
@@ -36,8 +36,13 @@ RUN echo Europe/Paris | tee /etc/timezone \
   && echo 'export PATH="$PATH:/var/www/vendor/bin"' >> ~/.bashrc \
   && npm install -g grunt-cli \
   && sed -i 's/\/var\/www\/html/\/var\/www\/web/g' /etc/apache2/sites-enabled/000-default.conf \
-  && composer global require drush/drush:9.* \
-  && ln -s /root/.config/composer/vendor/bin/drush /usr/bin/drush \
+  && cd /usr/local/src \
+  && git clone https://github.com/drush-ops/drush.git /usr/local/src/drush \
+  && cd drush \
+  && git checkout 10.5.0 \
+  && composer install \
+  && echo 'sudo -u www-data /usr/local/src/drush/drush "$@"' > /usr/bin/drush \
+  && chmod +x /usr/bin/drush \
   && phpdismod xdebug \
   && mkdir -p /var/scripts \
   && cd /var/scripts \
