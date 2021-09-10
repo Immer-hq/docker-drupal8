@@ -41,7 +41,8 @@ RUN echo Europe/Paris | tee /etc/timezone \
   && cd drush \
   && git checkout 10.5.0 \
   && composer install \
-  && echo 'sudo -u www-data /usr/local/src/drush/drush "$@"' > /usr/bin/drush \
+  && echo '#!/bin/bash' > /usr/bin/drush \
+  && echo 'sudo -u www-data /usr/local/src/drush/drush "$@"' >> /usr/bin/drush \
   && chmod +x /usr/bin/drush \
   && phpdismod xdebug \
   && mkdir -p /var/scripts \
